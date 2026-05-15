@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCatálogo Ventanilla | Por un futuro sin plástico</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        eco: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        beige: {
+                            50: '#fdfbf7',
+                            100: '#f8f4e6',
+                            200: '#f0e6ce',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-sans antialiased text-gray-800 bg-beige-50 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300">
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Botón Ir Arriba -->
+    <button id="btn-up" class="fixed bottom-6 right-6 bg-eco-600 text-white p-3 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 hover:bg-eco-700 hover:scale-110 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 bg-transparent py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 group">
+                    <div class="w-10 h-10 bg-eco-600 text-white rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform shadow-lg shadow-eco-500/30">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-2xl font-bold text-eco-700 dark:text-eco-400 tracking-tight">EcoCatálogo</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 dark:hover:text-eco-400 font-medium transition-colors">Inicio</a>
+                    <a href="#productos" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 dark:hover:text-eco-400 font-medium transition-colors">Productos</a>
+                    <a href="#beneficios" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 dark:hover:text-eco-400 font-medium transition-colors">Beneficios</a>
+                    <a href="#impacto" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 dark:hover:text-eco-400 font-medium transition-colors">Impacto Ambiental</a>
+                    <a href="#contacto" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 dark:hover:text-eco-400 font-medium transition-colors">Contacto</a>
+                    
+                    <button id="theme-toggle" class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors focus:outline-none">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                    </button>
+                    
+                    <a href="#impacto" class="bg-eco-600 text-white px-5 py-2.5 rounded-full hover:bg-eco-700 transition-all transform hover:-translate-y-0.5 shadow-md shadow-eco-500/30 font-medium">Explorar Información</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <button id="theme-toggle-mobile" class="p-2 text-gray-500 dark:text-gray-400 focus:outline-none">
+                        <svg id="theme-toggle-dark-icon-mobile" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <svg id="theme-toggle-light-icon-mobile" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <button id="mobile-menu-btn" class="text-gray-600 dark:text-gray-300 hover:text-eco-600 focus:outline-none">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden absolute w-full bg-white dark:bg-gray-800 shadow-xl border-t dark:border-gray-700">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#inicio" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">Inicio</a>
+                <a href="#problematica" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">El Problema</a>
+                <a href="#productos" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">Productos</a>
+                <a href="#beneficios" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">Beneficios</a>
+                <a href="#impacto" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">Impacto Ambiental</a>
+                <a href="#contacto" class="block px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-eco-50 dark:hover:bg-gray-700 hover:text-eco-600 rounded-md">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex items-center min-h-[90vh]">
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-[30rem] h-[30rem] rounded-full bg-eco-200 dark:bg-eco-900/40 blur-3xl opacity-50 z-0 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-teal-100 dark:bg-teal-900/30 blur-3xl opacity-50 z-0 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                <div class="text-left lg:w-1/2 fade-in-up">
+                    <span class="inline-flex items-center gap-2 py-1 px-3 rounded-full bg-eco-100 dark:bg-eco-900/50 text-eco-700 dark:text-eco-300 text-sm font-semibold mb-6">
+                        <span class="w-2 h-2 rounded-full bg-eco-500 animate-pulse"></span>
+                        Proyecto Ventanilla Sostenible
+                    </span>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6 leading-tight">
+                        Catálogo Informativo <span class="text-transparent bg-clip-text bg-gradient-to-r from-eco-500 to-teal-500">EcoVentanilla</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                        Promoviendo alternativas ecológicas para reducir el uso de plásticos de un solo uso en nuestros mercados locales. Descubre cómo pequeños cambios generan un gran impacto.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#productos" class="flex items-center justify-center gap-2 bg-eco-600 text-white px-8 py-3.5 rounded-full hover:bg-eco-700 transition-all transform hover:-translate-y-1 shadow-lg shadow-eco-500/40 text-lg font-medium">
+                            Ver Productos
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        </a>
+                        <a href="#impacto" class="flex items-center justify-center bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 px-8 py-3.5 rounded-full hover:border-eco-300 dark:hover:border-eco-700 hover:bg-eco-50 dark:hover:bg-gray-700 transition-all transform hover:-translate-y-1 shadow-sm text-lg font-medium">
+                            Saber Más
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 w-full fade-in-up" style="transition-delay: 200ms;">
+                    <div class="relative group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-eco-400 to-teal-400 transform skew-y-3 rounded-3xl opacity-30 blur-xl group-hover:opacity-40 transition-opacity duration-500"></div>
+                        <img src="seed_bag_hero_1778857340060.png" alt="Productos ecológicos en mercado" class="relative rounded-3xl shadow-2xl object-cover h-[400px] md:h-[500px] w-full border border-white/20">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problemática Section -->
+    <section id="problematica" class="py-24 bg-white dark:bg-gray-800/50 relative border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 fade-in-up">
+                    <span class="inline-flex items-center gap-2 py-1 px-3 rounded-full bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 text-sm font-semibold mb-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        La Problemática
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">El impacto del plástico en Ventanilla</h2>
+                    <div class="space-y-4 text-gray-600 dark:text-gray-400 text-justify leading-relaxed">
+                        <p>Actualmente, el uso excesivo de plásticos de un solo uso representa un grave problema ambiental en los mercados de Ventanilla. Comerciantes y consumidores utilizan diariamente bolsas y envases plásticos debido a su bajo costo y fácil accesibilidad, trayendo como consecuencia una gran generación de residuos contaminantes.</p>
+                        <p>Esta problemática trae consigo la acumulación de basura en calles, rincones y espacios públicos, además de contribuir en la contaminación de ríos y mares. Según el Ministerio del Ambiente del Perú (MINAM, 2025), en el país se consumen aproximadamente <strong>3 mil millones de bolsas plásticas al año</strong>, cuyo tiempo de degradación ronda los 400 años. Además, el MINAM señala que los plásticos conforman el <strong>10% de los residuos</strong> que se generan a nivel nacional, lo cual evidencia su uso desmedido.</p>
+                        <p class="font-medium text-gray-800 dark:text-gray-300">Esto refleja una falta de conciencia ambiental. De tal modo, es urgente y necesario implementar alternativas de solución que contribuyan a la reducción de la contaminación y, a su vez, promuevan un consumo más responsable en nuestra comunidad.</p>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 w-full fade-in-up" style="transition-delay: 200ms;">
+                    <div class="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-700">
+                        <img src="basurasEnVentanilla.png" alt="Problema de la contaminación plástica" class="w-full h-auto object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productos Section -->
+    <section id="productos" class="py-24 bg-beige-50 dark:bg-gray-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Alternativas Ecológicas</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400">Conoce los productos que pueden reemplazar al plástico en tu día a día, ideales para las compras en los mercados de Ventanilla.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="products-grid">
+                <!-- Tarjetas generadas por JS para mantener limpieza de HTML, pero las pongo aquí para que los rastreadores las vean -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Beneficios Section -->
+    <section id="beneficios" class="py-24 bg-beige-50 dark:bg-gray-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Múltiples Beneficios</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400">El cambio hacia productos sostenibles genera un impacto positivo en diferentes áreas de nuestra sociedad.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Económico -->
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:-translate-y-2 transition-transform duration-300 fade-in-up group overflow-hidden">
+                    <div class="w-full h-40 mb-6 rounded-2xl overflow-hidden">
+                        <img src="beneficio_economico_1778874020401.png" alt="Beneficio Económico" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="w-14 h-14 bg-eco-100 dark:bg-eco-900/50 text-eco-600 dark:text-eco-400 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">¿Cómo ayuda en lo económico?</h3>
+                    <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-start"><svg class="w-5 h-5 text-eco-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Reduce gastos en bolsas plásticas</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-eco-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Genera ahorro a largo plazo</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-eco-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Apoya pequeños negocios ecológicos</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-eco-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Reduce costos de limpieza pública</li>
+                    </ul>
+                </div>
+                
+                <!-- Personas -->
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:-translate-y-2 transition-transform duration-300 fade-in-up group overflow-hidden" style="transition-delay: 100ms;">
+                    <div class="w-full h-40 mb-6 rounded-2xl overflow-hidden">
+                        <img src="beneficio_personas_1778874033535.png" alt="Beneficio para las Personas" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="w-14 h-14 bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">¿Cómo ayuda a las personas?</h3>
+                    <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-start"><svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Genera conciencia ecológica</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Promueve hábitos responsables</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Facilita información ambiental</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Incentiva participación ciudadana</li>
+                    </ul>
+                </div>
+
+                <!-- Ambiente -->
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:-translate-y-2 transition-transform duration-300 fade-in-up group overflow-hidden" style="transition-delay: 200ms;">
+                    <div class="w-full h-40 mb-6 rounded-2xl overflow-hidden">
+                        <img src="beneficio_ambiente_1778874046838.png" alt="Beneficio Ambiental" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">¿Cómo ayuda al ambiente?</h3>
+                    <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+                        <li class="flex items-start"><svg class="w-5 h-5 text-green-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Reduce contaminación plástica</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-green-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Protege ríos y mares locales</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-green-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Fomenta el reciclaje activo</li>
+                        <li class="flex items-start"><svg class="w-5 h-5 text-green-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Disminuye residuos en basurales</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impacto Ambiental Section -->
+    <section id="impacto" class="py-24 bg-white dark:bg-gray-800/50 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Nuestro Impacto</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-2">Medimos el progreso de nuestra campaña educativa en los mercados de Ventanilla.</p>
+                <a href="https://www.muniventanilla.gob.pe/" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-eco-600 dark:text-eco-400 bg-eco-50 dark:bg-eco-900/30 inline-block px-4 py-2 rounded-full mt-2 hover:bg-eco-100 dark:hover:bg-eco-900/50 transition-colors">📊 Fuente: Programa EDUCCA Ventanilla (Metas 2025-2026)</a>
+            </div>
+
+            <!-- Contadores -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20" id="counters-section">
+                <div class="text-center p-6 bg-eco-50 dark:bg-eco-900/20 rounded-3xl border border-eco-100 dark:border-eco-800/30 fade-in-up">
+                    <div class="text-4xl md:text-5xl font-extrabold text-eco-600 dark:text-eco-400 mb-2"><span class="counter" data-target="50">0</span></div>
+                    <div class="text-gray-700 dark:text-gray-300 font-medium">Mercados locales a intervenir (2025-2026)</div>
+                </div>
+                <div class="text-center p-6 bg-teal-50 dark:bg-teal-900/20 rounded-3xl border border-teal-100 dark:border-teal-800/30 fade-in-up" style="transition-delay: 100ms;">
+                    <div class="text-4xl md:text-5xl font-extrabold text-teal-600 dark:text-teal-400 mb-2"><span class="counter" data-target="120">0</span> Ton</div>
+                    <div class="text-gray-700 dark:text-gray-300 font-medium">Plástico proyectado a reciclar en Ventanilla</div>
+                </div>
+                <div class="text-center p-6 bg-green-50 dark:bg-green-900/20 rounded-3xl border border-green-100 dark:border-green-800/30 fade-in-up" style="transition-delay: 200ms;">
+                    <div class="text-4xl md:text-5xl font-extrabold text-green-600 dark:text-green-400 mb-2"><span class="counter" data-target="15000">0</span></div>
+                    <div class="text-gray-700 dark:text-gray-300 font-medium">Vecinos a capacitar (Meta EDUCCA)</div>
+                </div>
+            </div>
+
+            <!-- Gráficos con Chart.js -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 fade-in-up">
+                    <h3 class="text-xl font-bold text-center text-gray-900 dark:text-white mb-6">Uso de Plástico vs Ecológico</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="impactChart1"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 fade-in-up" style="transition-delay: 100ms;">
+                    <h3 class="text-xl font-bold text-center text-gray-900 dark:text-white mb-6">Impacto Ambiental Positivo</h3>
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="impactChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto & Ubicación Section -->
+    <section id="contacto" class="py-24 bg-beige-50 dark:bg-gray-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Formulario -->
+                <div class="fade-in-up">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Únete al Cambio</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">¿Deseas saber más o participar en la difusión en Ventanilla? Escríbenos.</p>
+                    
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
+                            <input type="text" id="nombre" name="nombre" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-eco-500 focus:border-transparent transition-colors outline-none" placeholder="Tu nombre">
+                            <span class="text-red-500 text-sm hidden mt-1" id="err-nombre">El nombre es obligatorio.</span>
+                        </div>
+                        <div>
+                            <label for="correo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico</label>
+                            <input type="email" id="correo" name="correo" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-eco-500 focus:border-transparent transition-colors outline-none" placeholder="tu@correo.com">
+                            <span class="text-red-500 text-sm hidden mt-1" id="err-correo">Ingresa un correo válido.</span>
+                        </div>
+                        <div>
+                            <label for="mensaje" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensaje</label>
+                            <textarea id="mensaje" name="mensaje" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-eco-500 focus:border-transparent transition-colors outline-none resize-none" placeholder="¿Cómo te gustaría ayudar?"></textarea>
+                            <span class="text-red-500 text-sm hidden mt-1" id="err-mensaje">El mensaje es obligatorio.</span>
+                        </div>
+                        <button type="submit" class="w-full bg-eco-600 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-eco-700 transition-colors shadow-lg shadow-eco-500/30 flex justify-center items-center gap-2">
+                            <span>Enviar Mensaje</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </form>
+                    
+                    <!-- Mensaje de éxito -->
+                    <div id="success-msg" class="hidden mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
+                        <span class="block sm:inline font-medium">¡Mensaje enviado correctamente! Gracias por sumarte.</span>
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="fade-in-up" style="transition-delay: 200ms;">
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 p-2 h-full flex flex-col">
+                        <div class="h-64 sm:h-80 w-full rounded-2xl overflow-hidden relative">
+                            <!-- Mapa embebido de Ventanilla -->
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d124874.88040003295!2d-77.16876615703622!3d-11.879573887019803!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105d1b7c7b8c8d3%3A0x6b8c8e1d5d1c2b5!2sVentanilla%2C%20Callao!5e0!3m2!1ses!2spe!4v1689000000000!5m2!1ses!2spe" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-center space-y-4">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Información de Contacto</h3>
+                            <div class="flex items-start gap-3 text-gray-600 dark:text-gray-400">
+                                <svg class="w-6 h-6 text-eco-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span>Av. La Playa S/N, Plaza Principal de Ventanilla, Callao, Perú.</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                                <svg class="w-6 h-6 text-eco-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                <span>+51 916 824 553</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                                <svg class="w-6 h-6 text-eco-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                <span>Sajimenezna@ucvvirtual.edu.pe</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center md:items-start mb-12">
+                <div class="mb-8 md:mb-0 text-center md:text-left">
+                    <a href="#" class="flex items-center justify-center md:justify-start gap-2 mb-4">
+                        <div class="w-8 h-8 bg-eco-500 text-white rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="text-2xl font-bold text-white tracking-tight">EcoCatálogo</span>
+                    </a>
+                    <p class="text-gray-400 text-sm max-w-xs">Educando e informando para un distrito más limpio, verde y sostenible.</p>
+                </div>
+                <div class="flex space-x-8">
+                    <div class="flex flex-col space-y-3">
+                        <h4 class="text-gray-300 font-semibold mb-1">Navegación</h4>
+                        <a href="#inicio" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">Inicio</a>
+                        <a href="#problematica" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">El Problema</a>
+                        <a href="#productos" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">Productos</a>
+                        <a href="#beneficios" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">Beneficios</a>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <h4 class="text-gray-300 font-semibold mb-1">Legal</h4>
+                        <a href="#" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">Privacidad</a>
+                        <a href="#" class="text-gray-400 hover:text-eco-400 transition-colors text-sm">Términos</a>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-800 text-center flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                    &copy; 2026 EcoCatálogo Ventanilla. Proyecto Educativo.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals Container -->
+    <div id="modal-container" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-6">
+        <div id="modal-backdrop" class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0"></div>
+        
+        <div id="modal-content" class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300">
+            <button id="modal-close" class="absolute top-4 right-4 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-2 transition-colors focus:outline-none z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div id="modal-body" class="p-0">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
